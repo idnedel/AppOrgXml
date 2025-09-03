@@ -38,6 +38,7 @@ private void InitializeComponent()
             this.btn_iniciar.TabIndex = 0;
             this.btn_iniciar.Text = "Iniciar";
             this.btn_iniciar.UseVisualStyleBackColor = true;
+            this.btn_iniciar.Click += new System.EventHandler(this.btn_iniciar_click);
             // 
             // btn_parar
             // 

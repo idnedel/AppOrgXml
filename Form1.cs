@@ -6,8 +6,8 @@ namespace AppOrgXml
 {
     public partial class Form1 : Form
     {
-
         private Timer timer;
+
         public Form1()
         {
             InitializeComponent();
@@ -18,73 +18,109 @@ namespace AppOrgXml
             timer.Start();
         }
 
-        
         private void Timer_Tick(object sender, EventArgs e)
         {
             try
             {
-                ServiceController sc = new ServiceController("OrgXmlService");
-                lblStatus.Text = ($"Status do Serviço: {sc.Status}");
+                using (var sc = new ServiceController("OrgXmlService"))
+                {
+                    sc.Refresh();
+                    lblStatus.Text = $"Status do Serviço: {sc.Status}";
+                }
             }
-            catch (Exception)
+            catch
             {
                 lblStatus.Text = "Serviço não instalado.";
             }
-
         }
 
-
         private void btn_iniciar_click(object sender, EventArgs e)
-        {       
+        {
             try
-                 {
-                        ServiceController serviceController = new ServiceController("OrgXmlService");
+            {
+                using (var serviceController = new ServiceController("OrgXmlService"))
+                {
+                    serviceController.Refresh();
 
-                            if (serviceController.Status == ServiceControllerStatus.Stopped ||
-                                serviceController.Status == ServiceControllerStatus.Paused)
-                            {
-                                serviceController.Start();
-                                serviceController.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromSeconds(10));
-                                MessageBox.Show("Serviço iniciado com sucesso!", "Informação", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                            }
-                            else
-                            {
-                                MessageBox.Show("O serviço já está em execução ou não pode ser iniciado.", "Atenção", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show($"Erro ao iniciar o serviço: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        }
+                    if (serviceController.Status == ServiceControllerStatus.Stopped ||
+                        serviceController.Status == ServiceControllerStatus.Paused)
+                    {
+                        serviceController.Start();
+                        serviceController.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromSeconds(15));
+                        MessageBox.Show("Serviço iniciado com sucesso!", "Informação", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        MessageBox.Show("O serviço já está em execução ou não pode ser iniciado.", "Atenção", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
+                }
+            }
+            catch (System.TimeoutException)
+            {
+                MessageBox.Show("Tempo esgotado ao aguardar o serviço iniciar.", "Atenção", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao iniciar o serviço: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void btn_parar_click(object sender, EventArgs e)
         {
-            ServiceController serviceController = new ServiceController("OrgXmlService");
+            try
+            {
+                using (var serviceController = new ServiceController("OrgXmlService"))
+                {
+                    serviceController.Refresh();
 
-            if (serviceController.Status == ServiceControllerStatus.Running)
-            {
-                serviceController.Stop();
-                serviceController.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(10));
-                MessageBox.Show("Serviço parado com sucesso!", "Informação", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    if (serviceController.Status == ServiceControllerStatus.Running)
+                    {
+                        serviceController.Stop();
+                        serviceController.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(15));
+                        MessageBox.Show("Serviço parado com sucesso!", "Informação", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        MessageBox.Show("O serviço não está em execução ou não pode ser parado.", "Atenção", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
+                }
             }
-            else
+            catch (System.TimeoutException)
             {
-                MessageBox.Show("O serviço não está em execução ou não pode ser parado.", "Atenção", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Tempo esgotado ao aguardar o serviço parar.", "Atenção", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao parar o serviço: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private void btn_reiniciar_click(object sender, EventArgs e)
         {
-            ServiceController serviceController = new ServiceController("OrgXmlService");
-
-            if (serviceController.Status == ServiceControllerStatus.Running)
+            try
             {
-                serviceController.Stop();
-                serviceController.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(10));
-                serviceController.Start();
-                serviceController.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromSeconds(10));
-                MessageBox.Show("Serviço iniciado com sucesso!", "Informação", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                using (var serviceController = new ServiceController("OrgXmlService"))
+                {
+                    serviceController.Refresh();
+
+                    if (serviceController.Status == ServiceControllerStatus.Running)
+                    {
+                        serviceController.Stop();
+                        serviceController.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(15));
+                    }
+
+                    serviceController.Start();
+                    serviceController.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromSeconds(15));
+                    MessageBox.Show("Serviço iniciado com sucesso!", "Informação", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch (System.TimeoutException)
+            {
+                MessageBox.Show("Tempo esgotado ao reiniciar o serviço.", "Atenção", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao reiniciar o serviço: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }
