@@ -28,6 +28,7 @@ private void InitializeComponent()
             this.btn_reiniciar = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.lblStatus = new System.Windows.Forms.Label();
+            this.logBox = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // btn_iniciar
@@ -78,15 +79,30 @@ private void InitializeComponent()
             this.lblStatus.TabIndex = 4;
             this.lblStatus.Text = "Status Atual";
             // 
+            // logBox
+            // 
+            this.logBox.BackColor = System.Drawing.Color.LightGray;
+            this.logBox.Location = new System.Drawing.Point(152, 9);
+            this.logBox.Multiline = true;
+            this.logBox.Name = "logBox";
+            this.logBox.ReadOnly = true;
+            this.logBox.Size = new System.Drawing.Size(507, 408);
+            this.logBox.TabIndex = 5;
+            // 
             // Form1
             // 
+            this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this.ClientSize = new System.Drawing.Size(671, 429);
+            this.Controls.Add(this.logBox);
             this.Controls.Add(this.lblStatus);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.btn_reiniciar);
             this.Controls.Add(this.btn_parar);
             this.Controls.Add(this.btn_iniciar);
+            this.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.Name = "Form1";
+            this.Text = "logBox";
+            this.Load += new System.EventHandler(this.logBox_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -98,6 +114,7 @@ private void InitializeComponent()
         private System.Windows.Forms.Button btn_reiniciar;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label lblStatus;
+        private System.Windows.Forms.TextBox logBox;
     }
 
     
