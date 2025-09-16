@@ -23,19 +23,20 @@ namespace AppOrgXml
 /// </summary>
 private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.btn_iniciar = new System.Windows.Forms.Button();
             this.btn_parar = new System.Windows.Forms.Button();
             this.btn_reiniciar = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.lblStatus = new System.Windows.Forms.Label();
-            this.logBox = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // btn_iniciar
             // 
-            this.btn_iniciar.Location = new System.Drawing.Point(12, 31);
+            this.btn_iniciar.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btn_iniciar.Location = new System.Drawing.Point(12, 41);
             this.btn_iniciar.Name = "btn_iniciar";
-            this.btn_iniciar.Size = new System.Drawing.Size(126, 25);
+            this.btn_iniciar.Size = new System.Drawing.Size(291, 25);
             this.btn_iniciar.TabIndex = 0;
             this.btn_iniciar.Text = "Iniciar";
             this.btn_iniciar.UseVisualStyleBackColor = true;
@@ -43,9 +44,10 @@ private void InitializeComponent()
             // 
             // btn_parar
             // 
-            this.btn_parar.Location = new System.Drawing.Point(12, 62);
+            this.btn_parar.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btn_parar.Location = new System.Drawing.Point(12, 72);
             this.btn_parar.Name = "btn_parar";
-            this.btn_parar.Size = new System.Drawing.Size(126, 25);
+            this.btn_parar.Size = new System.Drawing.Size(291, 25);
             this.btn_parar.TabIndex = 1;
             this.btn_parar.Text = "Parar";
             this.btn_parar.UseVisualStyleBackColor = true;
@@ -53,9 +55,10 @@ private void InitializeComponent()
             // 
             // btn_reiniciar
             // 
-            this.btn_reiniciar.Location = new System.Drawing.Point(12, 93);
+            this.btn_reiniciar.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btn_reiniciar.Location = new System.Drawing.Point(12, 103);
             this.btn_reiniciar.Name = "btn_reiniciar";
-            this.btn_reiniciar.Size = new System.Drawing.Size(126, 25);
+            this.btn_reiniciar.Size = new System.Drawing.Size(291, 25);
             this.btn_reiniciar.TabIndex = 2;
             this.btn_reiniciar.Text = "Reiniciar";
             this.btn_reiniciar.UseVisualStyleBackColor = true;
@@ -64,45 +67,41 @@ private void InitializeComponent()
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 9);
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(12, 13);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(126, 13);
+            this.label1.Size = new System.Drawing.Size(159, 16);
             this.label1.TabIndex = 3;
             this.label1.Text = "Ações do serviço OrgXml";
             // 
             // lblStatus
             // 
             this.lblStatus.AutoSize = true;
-            this.lblStatus.Location = new System.Drawing.Point(12, 131);
+            this.lblStatus.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.lblStatus.Location = new System.Drawing.Point(15, 143);
             this.lblStatus.Name = "lblStatus";
-            this.lblStatus.Size = new System.Drawing.Size(64, 13);
+            this.lblStatus.Size = new System.Drawing.Size(66, 15);
             this.lblStatus.TabIndex = 4;
-            this.lblStatus.Text = "Status Atual";
-            // 
-            // logBox
-            // 
-            this.logBox.BackColor = System.Drawing.Color.LightGray;
-            this.logBox.Location = new System.Drawing.Point(152, 9);
-            this.logBox.Multiline = true;
-            this.logBox.Name = "logBox";
-            this.logBox.ReadOnly = true;
-            this.logBox.Size = new System.Drawing.Size(507, 408);
-            this.logBox.TabIndex = 5;
+            this.lblStatus.Text = "Status Atual:";
             // 
             // Form1
             // 
+            this.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.ClientSize = new System.Drawing.Size(671, 429);
-            this.Controls.Add(this.logBox);
+            this.ClientSize = new System.Drawing.Size(315, 177);
             this.Controls.Add(this.lblStatus);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.btn_reiniciar);
             this.Controls.Add(this.btn_parar);
             this.Controls.Add(this.btn_iniciar);
             this.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MaximumSize = new System.Drawing.Size(331, 216);
+            this.MinimumSize = new System.Drawing.Size(331, 216);
             this.Name = "Form1";
-            this.Text = "logBox";
-            this.Load += new System.EventHandler(this.logBox_Load);
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "Admin Center - Service OrgXml";
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -114,7 +113,6 @@ private void InitializeComponent()
         private System.Windows.Forms.Button btn_reiniciar;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label lblStatus;
-        private System.Windows.Forms.TextBox logBox;
     }
 
     
