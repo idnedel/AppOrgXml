@@ -1,7 +1,6 @@
 ﻿using System;
 using System.ServiceProcess;
 using System.Windows.Forms;
-using System.IO;
 
 namespace AppOrgXml
 {
@@ -9,19 +8,78 @@ namespace AppOrgXml
     {
         private Timer timer;
 
-        private DateTime _ultimaAtualizacaoLog = DateTime.MinValue;
-        private long _tamanhoUltimoLog = 0;
-
-        private readonly string caminhoLog = @"C:\ORGXML\OrgXmlService\logs\log.txt";
+        // Pipe
+        private PipeLogClient _pipeLogClient;
 
         public Form1()
         {
             InitializeComponent();
 
             timer = new Timer();
-            timer.Interval = 1000; // 1 segundo
+            timer.Interval = 1000;
             timer.Tick += Timer_Tick;
             timer.Start();
+
+            Load += Form1_Load;
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            try
+            {
+                using (var serviceController = new ServiceController("OrgXmlService"))
+                {
+                    serviceController.Refresh();
+                    if (serviceController.Status == ServiceControllerStatus.Running)
+                    {
+                        timer.Interval = 500;
+                    }
+                }
+
+                InicializarPipeLogs();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao inicializar: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void InicializarPipeLogs()
+        {
+            _pipeLogClient = new PipeLogClient();
+            _pipeLogClient.LogReceived += PipeLogClient_LogReceived;
+            _pipeLogClient.Start();
+            AppendPipeLine($"[PIPE] Cliente de pipe inicializado. Aguardando logs...{Environment.NewLine}");
+        }
+
+        private void PipeLogClient_LogReceived(PipeLogEntry entry)
+        {
+            if (!IsHandleCreated) return;
+
+            BeginInvoke((Action)(() =>
+            {
+                string line;
+                if (entry.IsRaw && !string.IsNullOrEmpty(entry.ParseError))
+                {
+                    line = $"{entry.Timestamp:yyyy-MM-dd HH:mm:ss.fff} [PIPE/{entry.Level}] (raw, erro parse: {entry.ParseError}) {entry.Message}";
+                }
+                else
+                {
+                    line = $"{entry.Timestamp:yyyy-MM-dd HH:mm:ss.fff} [PIPE/{entry.Level}] {entry.Message}";
+                }
+                AppendPipeLine(line + Environment.NewLine);
+            }));
+        }
+
+        private void AppendPipeLine(string text)
+        {
+            try
+            {
+                logBox.AppendText(text);
+                logBox.SelectionStart = logBox.TextLength;
+                logBox.ScrollToCaret();
+            }
+            catch { }
         }
 
         private void Timer_Tick(object sender, EventArgs e)
@@ -129,111 +187,18 @@ namespace AppOrgXml
                 MessageBox.Show($"Erro ao reiniciar o serviço: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        private void logBox_Load(object sender, EventArgs e)
-        {
-            try
-            {
-                MonitoraLog(caminhoLog);
-                CarregarLog(this, new FileSystemEventArgs(WatcherChangeTypes.Changed, Path.GetDirectoryName(caminhoLog), Path.GetFileName(caminhoLog)));
-
-
-                using (var serviceController = new ServiceController("OrgXmlService"))
-                {
-                    serviceController.Refresh();
-                    if (serviceController.Status == ServiceControllerStatus.Running)
-                    {
-                        timer.Interval = 500;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Erro ao carregar o log: {ex}");
-            }
-        }
-
-        private static FileSystemWatcher logWatcher;
-
-        public void MonitoraLog(string caminhoLog = @"C:\ORGXML\OrgXmlService\logs\log.txt")
-        {
-            if (logWatcher != null)
-            {
-                logWatcher.EnableRaisingEvents = false;
-                logWatcher.Changed -= CarregarLog;
-                logWatcher.Created -= CarregarLog;
-                logWatcher.Dispose();
-                logWatcher = null;
-            }
-
-            logWatcher = new FileSystemWatcher
-            {
-                Path = Path.GetDirectoryName(caminhoLog),
-                Filter = Path.GetFileName(caminhoLog),
-                NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName,
-                SynchronizingObject = this
-            };
-
-            logWatcher.Changed += CarregarLog;
-            logWatcher.Created += CarregarLog;
-            logWatcher.EnableRaisingEvents = true;
-        }
-
-        private void CarregarLog(object source, FileSystemEventArgs e)
-        {
-            try
-            {
-                if (InvokeRequired)
-                {
-                    BeginInvoke(new FileSystemEventHandler(CarregarLog), source, e);
-                    return;
-                }
-
-                if (!File.Exists(caminhoLog))
-                {
-                    logBox.Text = "Arquivo de log não encontrado.";
-                    _ultimaAtualizacaoLog = DateTime.MinValue;
-                    _tamanhoUltimoLog = -1;
-                    return;
-                }
-
-                var infoArquivo = new FileInfo(caminhoLog);
-
-                if (infoArquivo.LastWriteTime == _ultimaAtualizacaoLog && infoArquivo.Length == _tamanhoUltimoLog)
-                    return;
-
-                using (var fs = new FileStream(caminhoLog, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-                using (var sr = new StreamReader(fs))
-                {
-                    string conteudo = sr.ReadToEnd();
-                    logBox.Text = conteudo;
-                    logBox.SelectionStart = logBox.Text.Length;
-                    logBox.ScrollBars = ScrollBars.Vertical;
-                    logBox.ScrollToCaret();
-                }
-
-                _ultimaAtualizacaoLog = infoArquivo.LastWriteTime;
-                _tamanhoUltimoLog = infoArquivo.Length;
-
-            }
-            catch (Exception ex)
-            {
-                logBox.Text = $"Erro ao carregar o log: {ex.Message}";
-            }
-        }
 
         protected override void OnFormClosed(FormClosedEventArgs e)
         {
-            if (logWatcher != null)
+            if (_pipeLogClient != null)
             {
-                logWatcher.EnableRaisingEvents = false;
-                logWatcher.Changed -= CarregarLog;
-                logWatcher.Created -= CarregarLog;
-                logWatcher.Dispose();
-                logWatcher = null;
+                _pipeLogClient.LogReceived -= PipeLogClient_LogReceived;
+                _pipeLogClient.Stop();
+                _pipeLogClient.Dispose();
+                _pipeLogClient = null;
             }
+
             base.OnFormClosed(e);
         }
-
-
     }
 }

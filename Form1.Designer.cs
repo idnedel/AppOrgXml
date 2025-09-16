@@ -102,7 +102,7 @@ private void InitializeComponent()
             this.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.Name = "Form1";
             this.Text = "logBox";
-            this.Load += new System.EventHandler(this.logBox_Load);
+            this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
